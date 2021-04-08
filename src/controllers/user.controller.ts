@@ -1,47 +1,21 @@
 import {inject} from '@loopback/core';
 import {
-  Filter,
   FilterExcludingWhere,
   repository
 } from '@loopback/repository';
 import {
   del, get,
   getModelSchemaRef,
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   HttpErrors, param,
-
-
   post,
-
-
-
-
   put,
-
-
-
-
   Request, requestBody,
   response,
   RestBindings
 } from '@loopback/rest';
 import {User} from '../models';
 import {UserRepository} from '../repositories';
+import {AuthCode} from './schemas/authCode';
 
 export class UserController {
   constructor(
@@ -63,10 +37,8 @@ export class UserController {
       },
     },
   })
-  async find(
-    @param.filter(User) filter?: Filter<User>,
-  ): Promise<User[]> {
-    return this.userRepository.find(filter);
+  async find(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
   @get('/users/{id}')
@@ -149,18 +121,13 @@ export class UserController {
   })
   async authByCode(
     @requestBody({
+      required: true,
       content: {
-        'application/json': {
-          schema: getModelSchemaRef(User, {
-            title: 'Authentication with code',
-            exclude: ['id', 'perfil', 'exp', 'token'],
-          }),
-        },
+        'application/json': {schema: getModelSchemaRef(AuthCode)},
       },
     })
-    user: Omit<User, 'id'>,
+    user: any,
   ): Promise<User> {
-
-    return this.userRepository.create(user);
+    return this.userRepository.authWithCode(user.code);
   }
 }

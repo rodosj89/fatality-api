@@ -17,15 +17,14 @@ export class User extends Entity {
   perfil?: String;
 
   @property({
-    type: 'array',
-    itemType: 'number'
+    type: 'string',
   })
-  code?: number[];
+  code?: string;
 
   @property({
     type: 'number',
   })
-  exp?: Number;
+  exp: number;
 
   @property({
     type: 'string',
