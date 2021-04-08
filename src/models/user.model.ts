@@ -12,9 +12,10 @@ export class User extends Entity {
   id: string;
 
   @property({
-    type: 'string',
+    type: 'array',
+    itemType: 'number'
   })
-  code?: string;
+  code?: number[];
 
   @property({
     type: 'number',

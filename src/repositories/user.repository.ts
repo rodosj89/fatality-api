@@ -23,11 +23,11 @@ export class UserRepository extends DefaultCrudRepository<
 
   async generateCode(id: string, token: Object) {
     const time = 60;
-    const code = `${Math.floor((Math.random() * (8 - 0)) + 0)}${Math.floor((Math.random() * (8 - 0)) + 0)}${Math.floor((Math.random() * (8 - 0)) + 0)}`;
+    const code = [Math.floor((Math.random() * (8 - 0)) + 0), Math.floor((Math.random() * (8 - 0)) + 0), Math.floor((Math.random() * (8 - 0)) + 0)];
     const exp = moment().add(time, 's').unix();
     try {
       let userExists = await this.findById(id);
-      await this.updateById(id, {code, exp});
+      await this.updateById(id, {code: code, exp});
     } catch (error) {
       await this.create({
         id: id,
