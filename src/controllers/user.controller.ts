@@ -1,3 +1,4 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -8,7 +9,24 @@ import {
 } from '@loopback/repository';
 import {
   del, get,
-  getModelSchemaRef, param,
+  getModelSchemaRef,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  HttpErrors, param,
 
 
   patch, post,
@@ -18,8 +36,12 @@ import {
 
   put,
 
-  requestBody,
-  response
+
+
+
+  Request, requestBody,
+  response,
+  RestBindings
 } from '@loopback/rest';
 import {User} from '../models';
 import {UserRepository} from '../repositories';
@@ -28,7 +50,9 @@ export class UserController {
   constructor(
     @repository(UserRepository)
     public userRepository: UserRepository,
-  ) {}
+    @inject(RestBindings.Http.REQUEST) private request: Request,
+  ) {
+  }
 
   @post('/users')
   @response(200, {
@@ -152,7 +176,7 @@ export class UserController {
     await this.userRepository.deleteById(id);
   }
 
-  @get('/users/{id}/generate-code')
+  @get('/users/{id}/generate-code/{perfil}')
   @response(200, {
     description: 'Generate code by user',
     content: {
@@ -163,8 +187,36 @@ export class UserController {
   })
   async generateCodeByUser(
     @param.path.string('id') id: string,
+    @param.path.string('perfil') perfil: string,
   ): Promise<Object> {
-    return await this.userRepository.generateCode(id, {});
+    const req = await this.request;
+
+    if (!req.headers['authorization']) {
+      throw new HttpErrors.Unauthorized('Se requiere un Authorization Header');
+    }
+    let token = req.headers.authorization.split(' ')[1];
+    return await this.userRepository.generateCode(id, perfil, token);
   }
 
+  @post('/auth-code-fatality')
+  @response(200, {
+    description: 'Authentication with code',
+    content: {'application/json': {schema: getModelSchemaRef(User), }},
+  })
+  async authByCode(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(User, {
+            title: 'NewUser',
+            exclude: ['id'],
+          }),
+        },
+      },
+    })
+    user: Omit<User, 'id'>,
+  ): Promise<User> {
+
+    return this.userRepository.create(user);
+  }
 }

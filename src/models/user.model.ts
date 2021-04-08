@@ -12,6 +12,11 @@ export class User extends Entity {
   id: string;
 
   @property({
+    type: 'string',
+  })
+  perfil?: String;
+
+  @property({
     type: 'array',
     itemType: 'number'
   })
@@ -21,6 +26,11 @@ export class User extends Entity {
     type: 'number',
   })
   exp?: Number;
+
+  @property({
+    type: 'string',
+  })
+  token?: String;
 
   @hasMany(() => Device)
   devices: Device[];

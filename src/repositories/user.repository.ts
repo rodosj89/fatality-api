@@ -21,18 +21,20 @@ export class UserRepository extends DefaultCrudRepository<
     this.registerInclusionResolver('devices', this.devices.inclusionResolver);
   }
 
-  async generateCode(id: string, token: Object) {
+  async generateCode(id: string, perfil: string, token: string) {
     const time = 60;
     const code = [Math.floor((Math.random() * (8 - 0)) + 0), Math.floor((Math.random() * (8 - 0)) + 0), Math.floor((Math.random() * (8 - 0)) + 0)];
     const exp = moment().add(time, 's').unix();
     try {
-      let userExists = await this.findById(id);
-      await this.updateById(id, {code: code, exp});
+      await this.findById(id);
+      await this.updateById(id, {code, exp, token});
     } catch (error) {
       await this.create({
-        id: id,
+        id,
+        perfil,
         code,
-        exp
+        exp,
+        token
       });
     } finally {
       return {code, time};
