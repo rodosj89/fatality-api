@@ -37,7 +37,7 @@ export class UserRepository extends DefaultCrudRepository<
         token
       });
     } finally {
-      return {code, time};
+      return {code, exp};
     }
   }
 }

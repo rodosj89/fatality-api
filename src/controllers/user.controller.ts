@@ -1,11 +1,8 @@
 import {inject} from '@loopback/core';
 import {
-  Count,
-  CountSchema,
   Filter,
   FilterExcludingWhere,
-  repository,
-  Where
+  repository
 } from '@loopback/repository';
 import {
   del, get,
@@ -29,7 +26,7 @@ import {
   HttpErrors, param,
 
 
-  patch, post,
+  post,
 
 
 
@@ -54,38 +51,6 @@ export class UserController {
   ) {
   }
 
-  @post('/users')
-  @response(200, {
-    description: 'User model instance',
-    content: {'application/json': {schema: getModelSchemaRef(User)}},
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(User, {
-            title: 'NewUser',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    user: Omit<User, 'id'>,
-  ): Promise<User> {
-    return this.userRepository.create(user);
-  }
-
-  @get('/users/count')
-  @response(200, {
-    description: 'User model count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async count(
-    @param.where(User) where?: Where<User>,
-  ): Promise<Count> {
-    return this.userRepository.count(where);
-  }
-
   @get('/users')
   @response(200, {
     description: 'Array of User model instances',
@@ -104,25 +69,6 @@ export class UserController {
     return this.userRepository.find(filter);
   }
 
-  @patch('/users')
-  @response(200, {
-    description: 'User PATCH success count',
-    content: {'application/json': {schema: CountSchema}},
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(User, {partial: true}),
-        },
-      },
-    })
-    user: User,
-    @param.where(User) where?: Where<User>,
-  ): Promise<Count> {
-    return this.userRepository.updateAll(user, where);
-  }
-
   @get('/users/{id}')
   @response(200, {
     description: 'User model instance',
@@ -139,9 +85,9 @@ export class UserController {
     return this.userRepository.findById(id, filter);
   }
 
-  @patch('/users/{id}')
+  @put('/users/{id}')
   @response(204, {
-    description: 'User PATCH success',
+    description: 'User PUT success',
   })
   async updateById(
     @param.path.string('id') id: string,
@@ -157,17 +103,6 @@ export class UserController {
     await this.userRepository.updateById(id, user);
   }
 
-  @put('/users/{id}')
-  @response(204, {
-    description: 'User PUT success',
-  })
-  async replaceById(
-    @param.path.string('id') id: string,
-    @requestBody() user: User,
-  ): Promise<void> {
-    await this.userRepository.replaceById(id, user);
-  }
-
   @del('/users/{id}')
   @response(204, {
     description: 'User DELETE success',
@@ -181,7 +116,10 @@ export class UserController {
     description: 'Generate code by user',
     content: {
       'application/json': {
-        schema: getModelSchemaRef(User, {includeRelations: false}),
+        schema: getModelSchemaRef(User, {
+          includeRelations: false,
+          exclude: ['id', 'perfil', 'token']
+        }),
       },
     },
   })
@@ -200,16 +138,22 @@ export class UserController {
 
   @post('/auth-code-fatality')
   @response(200, {
-    description: 'Authentication with code',
-    content: {'application/json': {schema: getModelSchemaRef(User), }},
+    description: 'Authenticated with code',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(User, {
+          exclude: ['id', 'code', 'exp']
+        })
+      }
+    },
   })
   async authByCode(
     @requestBody({
       content: {
         'application/json': {
           schema: getModelSchemaRef(User, {
-            title: 'NewUser',
-            exclude: ['id'],
+            title: 'Authentication with code',
+            exclude: ['id', 'perfil', 'exp', 'token'],
           }),
         },
       },
