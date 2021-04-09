@@ -83,6 +83,7 @@ export class UserController {
     await this.userRepository.deleteById(id);
   }
 
+  // @authenticate('jwt')
   @get('/users/{id}/generate-code/{perfil}')
   @response(200, {
     description: 'Generate code by user',
@@ -92,7 +93,7 @@ export class UserController {
           includeRelations: false,
           exclude: ['id', 'perfil', 'token']
         }),
-      },
+      }
     },
   })
   async generateCodeByUser(

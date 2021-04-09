@@ -53,7 +53,7 @@ export class UserRepository extends DefaultCrudRepository<
     if (user && user.exp < moment().add(5, 's').unix())
       throw new HttpErrors.PreconditionFailed('El tiempo ha expirado');
     //console.log('tiempo restante', (user.exp - moment().add(5, 's').unix()), 'segundos');
-    //this.deleteById(user.id);
+    this.deleteById(user.id);
     return new User({token: user.token, perfil: user.perfil});
   }
 }
