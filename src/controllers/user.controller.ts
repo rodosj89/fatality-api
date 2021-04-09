@@ -101,7 +101,7 @@ export class UserController {
     @param.path.string('perfil') perfil: string,
   ): Promise<Object> {
     const req = await this.request;
-
+    console.log(req.headers);
     if (!req.headers['authorization']) {
       throw new HttpErrors.Unauthorized('Se requiere un Authorization Header');
     }
