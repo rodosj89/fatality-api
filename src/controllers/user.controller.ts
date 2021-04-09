@@ -101,12 +101,12 @@ export class UserController {
     @param.path.string('perfil') perfil: string,
   ): Promise<Object> {
     const req = await this.request;
-    console.log(req.headers);
     if (!req.headers['authorization']) {
       throw new HttpErrors.Unauthorized('Se requiere un Authorization Header');
     }
     let token = req.headers.authorization.split(' ')[1];
-    return await this.userRepository.generateCode(id, perfil, token);
+    const ip = req.headers['x-forwarded-for'] || '';
+    return await this.userRepository.generateCode(id, perfil, token, ip.toString().split(',')[ip.toString().split(',').length - 1]);
   }
 
   @post('/auth-code-fatality')
@@ -129,6 +129,8 @@ export class UserController {
     })
     user: any,
   ): Promise<User> {
-    return this.userRepository.authWithCode(user.code);
+    const req = await this.request;
+    const ip = req.headers['x-forwarded-for'] || '';
+    return this.userRepository.authWithCode(user.code, ip.toString().split(',')[ip.toString().split(',').length - 1]);
   }
 }

@@ -31,6 +31,11 @@ export class User extends Entity {
   })
   token?: String;
 
+  @property({
+    type: 'string',
+  })
+  ip?: String;
+
   @hasMany(() => Device)
   devices: Device[];
 
